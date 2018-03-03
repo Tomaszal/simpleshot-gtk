@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/com/tomaszal/screenshot-app">
+		<file preprocess="xml-stripblanks">screenshot-menu.ui</file>
+	</gresource>
+</gresources>

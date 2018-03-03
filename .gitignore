@@ -1,0 +1,10 @@
+# Build files
+*.o
+simpleshot
+
+# GLib resource source file
+resources.c
+
+# Sublime files
+*sublime-workspace
+*sublime-project
