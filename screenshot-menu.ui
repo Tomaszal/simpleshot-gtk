@@ -89,11 +89,12 @@
 							</packing>
 						</child>
 						<child>
-							<object class="GtkComboBox">
+							<object class="GtkComboBox" id="area_list">
 								<property name="visible">True</property>
 								<property name="can_focus">False</property>
 								<property name="model">area</property>
 								<property name="active">0</property>
+								<signal name="changed" handler="area_list_changed"/>
 								<child>
 									<object class="GtkCellRendererText"/>
 									<attributes>
@@ -127,14 +128,14 @@
 									</packing>
 								</child>
 								<child>
-									<object class="GtkCheckButton" id="disable_delay">
+									<object class="GtkCheckButton" id="delay_disable">
 										<property name="label" translatable="yes">No delay</property>
 										<property name="visible">True</property>
 										<property name="can_focus">True</property>
 										<property name="receives_default">False</property>
 										<property name="draw_indicator">True</property>
 										<property name="active">1</property>
-										<signal name="toggled" handler="disable_delay_toggled"/>
+										<signal name="toggled" handler="delay_disable_toggled"/>
 									</object>
 									<packing>
 										<property name="expand">False</property>
@@ -179,7 +180,7 @@
 						<property name="orientation">vertical</property>
 						<property name="spacing">8</property>
 						<child>
-							<object class="GtkCheckButton">
+							<object class="GtkCheckButton" id="include_cursor">
 								<property name="label" translatable="yes">Include mouse pointer</property>
 								<property name="visible">True</property>
 								<property name="can_focus">True</property>
@@ -193,7 +194,7 @@
 							</packing>
 						</child>
 						<child>
-							<object class="GtkCheckButton">
+							<object class="GtkCheckButton" id="include_decorations">
 								<property name="label" translatable="yes">Include windows decorations</property>
 								<property name="visible">True</property>
 								<property name="can_focus">True</property>
@@ -257,7 +258,7 @@
 						<property name="can_focus">True</property>
 						<property name="has_focus">True</property>
 						<property name="receives_default">True</property>
-						<signal name="clicked" handler="screenshot_clicked"/>
+						<signal name="clicked" handler="screenshot_button_clicked"/>
 						<style>
 							<class name="suggested-action"/>
 						</style>
