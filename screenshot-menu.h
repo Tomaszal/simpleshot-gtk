@@ -12,4 +12,4 @@ G_DECLARE_FINAL_TYPE (ScreenshotMenu,
 
 ScreenshotMenu *screenshot_menu_new (ScreenshotApp *app);
 
-#endif /* SCREENSHOT_MENU_H */
+#endif // SCREENSHOT_MENU_H
