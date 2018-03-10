@@ -10,6 +10,8 @@ struct _ScreenshotMenu
 
 struct _ScreenshotMenuPrivate
 {
+	GSettings *settings;
+
 	GtkWidget *delay_value;
 	GtkWidget *delay_disable;
 
@@ -97,15 +99,54 @@ area_list_changed (GtkWidget      *area_list,
 }
 
 static void
+screenshot_menu_dispose (GObject *object)
+{
+	ScreenshotMenu *win;
+	ScreenshotMenuPrivate *priv;
+
+	// Get window instance and private window instacne
+	win = SCREENSHOT_MENU (object);
+	priv = screenshot_menu_get_instance_private (win);
+
+	// Dispose of settings object
+	g_clear_object (&priv->settings);
+
+	// Dispose of parent class
+	G_OBJECT_CLASS (screenshot_menu_parent_class)->dispose (object);
+}
+
+static void
 screenshot_menu_init (ScreenshotMenu *win)
 {
 	ScreenshotMenuPrivate *priv;
 
-	// Init window from the template
-	gtk_widget_init_template (GTK_WIDGET (win));
-
 	// Get private window instance
 	priv = screenshot_menu_get_instance_private (win);
+
+	// Initialize window from the template
+	gtk_widget_init_template (GTK_WIDGET (win));
+
+	// Initialize GSettings
+	priv->settings = g_settings_new ("com.tomaszal.simpleshot");
+
+	// Bind settings
+	g_settings_bind (priv->settings, "area",
+	                 priv->area_list, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+
+	g_settings_bind (priv->settings, "delay-value",
+	                 priv->delay_value, "value",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (priv->settings, "delay-disable",
+	                 priv->delay_disable, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+
+	g_settings_bind (priv->settings, "include-cursor",
+	                 priv->include_cursor, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (priv->settings, "include-decorations",
+	                 priv->include_decorations, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
 
 	// Update UI elements
 	delay_disable_toggled (GTK_WIDGET (priv->delay_disable), win);
@@ -115,6 +156,9 @@ screenshot_menu_init (ScreenshotMenu *win)
 static void
 screenshot_menu_class_init (ScreenshotMenuClass *class)
 {
+	// Assign GApplication entry points
+	G_OBJECT_CLASS (class)->dispose = screenshot_menu_dispose;
+
 	// Set window template from a resource
 	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (class), "/com/tomaszal/simpleshot/screenshot-menu.ui");
 

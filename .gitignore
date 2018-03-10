@@ -2,8 +2,10 @@
 *.o
 simpleshot
 
-# GLib resource source file
+# GLib compiled files
 resources.c
+gschemas.compiled
+*.gschema.valid
 
 # Sublime files
 *sublime-workspace

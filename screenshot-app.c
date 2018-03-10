@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include "screenshot-app.h"
 #include "screenshot-menu.h"
@@ -19,12 +20,14 @@ show_about (GSimpleAction *action,
 {
 	const gchar *authors[] = { "Tomas Zaluckij (@Tomaszal)", NULL };
 
+	// Create and show about dialog
 	GList *windows = gtk_application_get_windows (GTK_APPLICATION (data));
 	gtk_show_about_dialog (GTK_WINDOW (g_list_nth_data (windows, 0)),
 	                       "authors", authors,
 	                       "program-name", "Simpleshot",
-	                       "title", "About Simpleshot",
-	                       "comments", "A simple GTK screenshot application (WIP).",
+	                       "title", _("About Simpleshot"),
+	                       "comments", _("A simple GTK screenshot application (WIP)."),
+	                       "translator-credits", _("translator-credits"),
 	                       "logo-icon-name", "applets-screenshooter",
 	                       "license-type", GTK_LICENSE_GPL_3_0,
 	                       NULL);

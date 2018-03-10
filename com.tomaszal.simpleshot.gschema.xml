@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema path="/com/tomaszal/simpleshot/" id="com.tomaszal.simpleshot">
+		<key name="area" type="i">
+			<default>0</default>
+		</key>
+		<key name="delay-value" type="i">
+			<default>1</default>
+		</key>
+		<key name="delay-disable" type="b">
+			<default>true</default>
+		</key>
+		<key name="include-cursor" type="b">
+			<default>false</default>
+		</key>
+		<key name="include-decorations" type="b">
+			<default>false</default>
+		</key>
+	</schema>
+</schemalist>
