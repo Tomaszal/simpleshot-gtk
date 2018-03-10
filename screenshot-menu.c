@@ -43,12 +43,14 @@ static void
 delay_disable_toggled (GtkWidget      *toggle_button,
                        ScreenshotMenu *win)
 {
-	// Get private window instance
 	ScreenshotMenuPrivate *priv;
+	gboolean show_delay;
+
+	// Get private window instance
 	priv = screenshot_menu_get_instance_private (win);
 
 	// Set delay_value sensitivity
-	gboolean show_delay = ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (toggle_button)) && gtk_widget_get_sensitive (GTK_WIDGET (toggle_button));
+	show_delay = ! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (toggle_button)) && gtk_widget_get_sensitive (GTK_WIDGET (toggle_button));
 	gtk_widget_set_sensitive (GTK_WIDGET (priv->delay_value), show_delay);
 }
 
@@ -56,15 +58,17 @@ static void
 area_list_changed (GtkWidget      *area_list,
                    ScreenshotMenu *win)
 {
-	// Get private window instance
 	ScreenshotMenuPrivate *priv;
+	gint index;
+	gint options[3];
+
+	// Get private window instance
 	priv = screenshot_menu_get_instance_private (win);
 
 	// Get selected area index (-1 - none; 0 - entire screen; 1 - active window; 2 - region)
-	gint index = gtk_combo_box_get_active (GTK_COMBO_BOX (area_list));
+	index = gtk_combo_box_get_active (GTK_COMBO_BOX (area_list));
 
 	// Set sensetivity for capture options (0 - delay, 1 - include cursor; 2 - show decorations)
-	gint options[3];
 	switch (index)
 	{
 		case 0:
@@ -95,22 +99,24 @@ area_list_changed (GtkWidget      *area_list,
 static void
 screenshot_menu_init (ScreenshotMenu *win)
 {
+	ScreenshotMenuPrivate *priv;
+
 	// Init window from the template
 	gtk_widget_init_template (GTK_WIDGET (win));
 
 	// Get private window instance
-	ScreenshotMenuPrivate *priv;
 	priv = screenshot_menu_get_instance_private (win);
 
+	// Update UI elements
 	delay_disable_toggled (GTK_WIDGET (priv->delay_disable), win);
+	area_list_changed (GTK_WIDGET (priv->area_list), win);
 }
 
 static void
 screenshot_menu_class_init (ScreenshotMenuClass *class)
 {
 	// Set window template from a resource
-	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (class),
-	                                             "/com/tomaszal/screenshot-app/screenshot-menu.ui");
+	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (class), "/com/tomaszal/simpleshot/screenshot-menu.ui");
 
 	// Bind widgets from the template
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ScreenshotMenu, delay_value);
