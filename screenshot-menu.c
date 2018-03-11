@@ -21,38 +21,51 @@ typedef struct _ScreenshotMenuPrivate ScreenshotMenuPrivate;
 
 struct _ScreenshotMenu
 {
-	GtkApplicationWindow   parent;
+	GtkApplicationWindow parent;
 
 	ScreenshotMenuPrivate *priv;
+
+	gint     area;
+	gint     delay;
+	gboolean include_cursor;
+	gboolean include_decorations;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (ScreenshotMenu,
                             screenshot_menu,
                             GTK_TYPE_APPLICATION_WINDOW);
 
+static gboolean
+start_screenshot (gpointer data)
+{
+	// Make a screenshot
+	screenshot (gtk_combo_box_get_active (GTK_COMBO_BOX (SCREENSHOT_MENU (data)->priv->area_list)),
+	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_cursor)),
+	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_decorations)));
+
+	// Show screenshot menu window
+	gtk_widget_show (GTK_WIDGET (data));
+
+	// Remove GSource from the main loop
+	return G_SOURCE_REMOVE;
+}
+
 static void
 screenshot_button_clicked (GtkWidget      *button,
                            ScreenshotMenu *win)
 {
 	// Variables
-	int delay;
+	guint delay = 0;
 
 	// Get the screenshot delay
-	delay = 0;
 	if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->delay_disable)))
 		delay = gtk_adjustment_get_value (gtk_spin_button_get_adjustment (GTK_SPIN_BUTTON (win->priv->delay_value)));
 
-	// Hide screenshot menu widn
-	// gtk_window_close (GTK_WINDOW (win));
+	// Hide screenshot menu window
+	gtk_widget_hide (GTK_WIDGET (win));
 
-	// Make a screenshot menu window
-	screenshot (gtk_combo_box_get_active (GTK_COMBO_BOX (win->priv->area_list)),
-	            delay,
-	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->include_cursor)),
-	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->include_decorations)));
-
-	// Show screenshot menu window
-	// gtk_widget_show (GTK_WIDGET (win));
+	// Start async screenshot function
+	g_timeout_add_seconds (delay, start_screenshot, win);
 }
 
 static void
@@ -72,15 +85,16 @@ area_list_changed (GtkWidget      *area_list,
                    ScreenshotMenu *win)
 {
 	// Variables
-	gint index;
-	gint options[3][3] = {
-		{ 1, 1, 0 },
-		{ 1, 1, 1 },
-		{ 0, 0, 0 }
+	gint     index;
+	gboolean options[3][3] = {
+		{ TRUE,  TRUE,  FALSE },
+		{ TRUE,  TRUE,  TRUE  },
+		{ FALSE, FALSE, FALSE }
 	};
 
-	// Get selected area index (-1 - none; 0 - entire screen; 1 - active window; 2 - region)
+	// Get selected area index (0 - entire screen; 1 - active window; 2 - region)
 	index = gtk_combo_box_get_active (GTK_COMBO_BOX (area_list));
+	win->area = index;
 
 	// Set sensetivity for capture options (0 - delay, 1 - include cursor; 2 - show decorations)
 	gtk_widget_set_sensitive (GTK_WIDGET (win->priv->delay_disable), options[index][0]);
@@ -92,14 +106,8 @@ area_list_changed (GtkWidget      *area_list,
 static void
 screenshot_menu_dispose (GObject *object)
 {
-	// Variables
-	ScreenshotMenu *win;
-
-	// Get window instance and private window instacne
-	win = SCREENSHOT_MENU (object);
-
 	// Dispose of settings object
-	g_clear_object (&win->priv->settings);
+	g_clear_object (&SCREENSHOT_MENU (object)->priv->settings);
 
 	// Dispose of parent class
 	G_OBJECT_CLASS (screenshot_menu_parent_class)->dispose (object);

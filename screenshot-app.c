@@ -7,6 +7,8 @@
 struct _ScreenshotApp
 {
 	GtkApplication parent;
+
+	ScreenshotMenu *win;
 };
 
 G_DEFINE_TYPE (ScreenshotApp,
@@ -51,15 +53,12 @@ static GActionEntry app_entries[] =
 static void
 screenshot_app_activate (GApplication *app)
 {
-	// Variables
-	ScreenshotMenu *win;
-
 	// Activate parent class
 	G_APPLICATION_CLASS (screenshot_app_parent_class)->activate (app);
 
 	// Create and activate the screenshot menu window
-	win = screenshot_menu_new (SCREENSHOT_APP (app));
-	gtk_window_present (GTK_WINDOW (win));
+	SCREENSHOT_APP (app)->win = screenshot_menu_new (SCREENSHOT_APP (app));
+	gtk_window_present (GTK_WINDOW (SCREENSHOT_APP (app)->win));
 }
 
 static void

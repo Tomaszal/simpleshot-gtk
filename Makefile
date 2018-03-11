@@ -1,12 +1,12 @@
 CC ?= gcc
 PKGCONFIG = $(shell which pkg-config)
-CFLAGS = $(shell $(PKGCONFIG) --cflags gtk+-3.0)
-LIBS = $(shell $(PKGCONFIG) --libs gtk+-3.0)
+CFLAGS = $(shell $(PKGCONFIG) --cflags gtk+-3.0 MagickWand)
+LIBS = $(shell $(PKGCONFIG) --libs gtk+-3.0 MagickWand) -lslopy -lX11
 GLIB_COMPILE_RESOURCES = $(shell $(PKGCONFIG) --variable=glib_compile_resources gio-2.0)
 GLIB_COMPILE_SCHEMAS = $(shell $(PKGCONFIG) --variable=glib_compile_schemas gio-2.0)
 
 TARGET = simpleshot
-SRC = screenshot-app.c screenshot-menu.c simpleshot.c
+SRC = simpleshot.c screenshot-app.c screenshot-menu.c screenshot-logic.c
 G_RESOURCE = simpleshot.gresource.xml
 G_SCHEMA = com.tomaszal.simpleshot.gschema.valid
 
