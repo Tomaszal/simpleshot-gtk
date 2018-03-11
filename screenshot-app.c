@@ -18,6 +18,7 @@ show_about (GSimpleAction *action,
             GVariant      *parameter,
             gpointer       data)
 {
+	// Variables
 	const gchar *authors[] = { "Tomas Zaluckij (@Tomaszal)", NULL };
 
 	// Create and show about dialog
@@ -50,6 +51,7 @@ static GActionEntry app_entries[] =
 static void
 screenshot_app_activate (GApplication *app)
 {
+	// Variables
 	ScreenshotMenu *win;
 
 	// Activate parent class
@@ -63,6 +65,7 @@ screenshot_app_activate (GApplication *app)
 static void
 screenshot_app_startup (GApplication *app)
 {
+	// Variables
 	GtkBuilder *builder;
 	GMenuModel *app_menu;
 
@@ -85,6 +88,10 @@ screenshot_app_startup (GApplication *app)
 	builder = gtk_builder_new_from_resource ("/com/tomaszal/simpleshot/app-menu.ui");
 	app_menu = G_MENU_MODEL (gtk_builder_get_object (builder, "appmenu"));
 	gtk_application_set_app_menu (GTK_APPLICATION (app), app_menu);
+
+	// Cleanup
+	g_object_unref (builder);
+	g_object_unref (app_menu);
 }
 
 static void
