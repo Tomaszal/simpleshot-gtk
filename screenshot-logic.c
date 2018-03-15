@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <slop.hpp>
 
 #include "screenshot-logic.h"
 
@@ -30,6 +31,33 @@ find_current_window ()
 
 	// Return the toplevel ancestor of the found window
 	return gdk_window_get_toplevel (window);
+}
+
+static GdkRectangle
+get_region_area ()
+{
+	GdkRectangle area;
+	struct slop_options options;
+	struct slop_selection selection;
+
+	// Set slop options
+	options = slop_options_default ();
+	options.noopengl = 1;
+	options.border = 4;
+	options.r = 0.8;
+	options.g = 0.2;
+	options.b = 0.2;
+
+	// Start slop selection
+	selection = slop_select (&options);
+
+	// Convert slop selection to rectangle
+	area.x = selection.x;
+	area.y = selection.y;
+	area.width = selection.w;
+	area.height = selection.h;
+
+	return area;
 }
 
 static GdkRectangle
@@ -112,7 +140,7 @@ screenshot (gint     area_index,
 
 	if (area_index == REGION_AREA)
 	{
-		// area = get_region_area ();
+		area = get_region_area ();
 
 		printf("Selected region:\n");
 	}
