@@ -1,175 +1,130 @@
 #include <gtk/gtk.h>
-#include <MagickWand/MagickWand.h>
-#include <slop.hpp>
-#include <X11/Xlib.h>
-#include <stdio.h>
 
 #include "screenshot-logic.h"
 
-struct area {
-	int x;
-	int y;
-	int w;
-	int h;
-};
-
-struct area
-region_select ()
+static void
+get_window_coordinates (GdkWindow *window,
+                        gboolean include_border,
+                        GdkRectangle *real_coordinates_out,
+                        GdkRectangle *visible_coordinates_out)
 {
-	// Variables
-	struct slop_options options;
-	struct slop_selection selection;
-	struct area area;
+	// Window coordinates that are within the screen
+	GdkRectangle visible_coordinates;
+	GdkRectangle real_coordinates;
+	GdkRectangle monitor_gemoetry;
 
-	// Set slop options
-	options = slop_options_default ();
-	options.noopengl = 1;
-	options.border = 4;
-	options.r = 0.8;
-	options.g = 0.2;
-	options.b = 0.2;
+	if (include_border)
+	{
+		// Get real window coordinates with border
+		gdk_window_get_frame_extents (window, &real_coordinates);
+	}
+	else
+	{
+		// Get real window coordinates without border
+		real_coordinates.width = gdk_window_get_width (window);
+		real_coordinates.height = gdk_window_get_height (window);
 
-	// Start slop selection
-	selection = slop_select (&options);
+		gdk_window_get_origin (window,
+		                       &real_coordinates.x,
+		                       &real_coordinates.y);
+	}
 
-	// Transfer selection to area struct
-	area.x = (int) selection.x;
-	area.y = (int) selection.y;
-	area.w = (int) selection.w;
-	area.h = (int) selection.h;
+	if (real_coordinates_out != NULL)
+	{
+		// Return real coordinates
+		*real_coordinates_out = real_coordinates;
+	}
 
-	// Return selected region area
-	return area;
+	// Calculate coordinates of the window that are visible
+	visible_coordinates = real_coordinates;
+
+	if (visible_coordinates.x < 0)
+	{
+		visible_coordinates.width += visible_coordinates.x;
+		visible_coordinates.x = 0;
+	}
+
+	if (visible_coordinates.y < 0)
+	{
+		visible_coordinates.height += visible_coordinates.y;
+		visible_coordinates.y = 0;
+	}
+
+	gdk_monitor_get_geometry (gdk_display_get_monitor_at_window (gdk_display_get_default (), window), &monitor_gemoetry);
+
+	if (visible_coordinates.x + visible_coordinates.width > monitor_gemoetry.width)
+	{
+		visible_coordinates.width = monitor_gemoetry.width - visible_coordinates.x;
+	}
+
+	if (visible_coordinates.y + visible_coordinates.height > monitor_gemoetry.height)
+	{
+		visible_coordinates.height = monitor_gemoetry.height - visible_coordinates.y;
+	}
+
+	if (visible_coordinates_out != NULL)
+	{
+		// Return screenshot coordinates
+		*visible_coordinates_out = visible_coordinates;
+	}
 }
 
-struct area
-active_window_select ()
+static GdkWindow *
+find_current_window ()
 {
-	// Variables
-	struct area area;
+	GdkWindow *window = NULL;
+	GdkSeat *seat;
+	GdkDevice *device;
+	GdkScreen *screen;
 
-	// X11
-	int revert = RevertToNone;
-	Display *display;
-	Window window;
-	XWindowAttributes attr;
+	// Try to find an active window
+	screen = gdk_screen_get_default ();
+	window = gdk_screen_get_active_window (screen); // Deprecated, replace with custom function
+	seat = gdk_display_get_default_seat (gdk_display_get_default ());
+	device = gdk_seat_get_pointer (seat);
 
-	// Get X11 window attributes
-	display = XOpenDisplay(NULL);
-	XGetInputFocus (display, &window, &revert);
-	XGetWindowAttributes (display, window, &attr);
+	if (window == NULL)
+	{
+		// If there is no active window, try to get the window under the cursor
+		window = gdk_device_get_window_at_position (device, NULL, NULL);
+	}
 
-	// Transfer selection to area struct
-	area.x = attr.x;
-	area.y = attr.y;
-	area.w = attr.width;
-	area.h = attr.height;
+	if (window != NULL)
+	{
+		if (gdk_window_get_type_hint (window) == GDK_WINDOW_TYPE_HINT_DESKTOP)
+		{
+			// If selected window is destkop, get the whole screen
+			window = NULL;
+		}
+		else
+		{
+			// Get the toplevel ancestor of selected window
+			window = gdk_window_get_toplevel (window);
+		}
+	}
 
-	// Return active window area
-	return area;
-}
+	if (window == NULL)
+	{
+		// If no window was found, get the root window (whole screen)
+		window = gdk_get_default_root_window ();
+	}
 
-struct area
-screen_select ()
-{
-	// Variables
-	struct area area;
-
-	// X11
-	Display *display;
-	XWindowAttributes attr;
-
-	// Get X11 window attributes
-	display = XOpenDisplay(NULL);
-	XGetWindowAttributes (display, DefaultRootWindow(display), &attr);
-
-	// Transfer selection to area struct
-	area.x = 0;
-	area.y = 0;
-	area.w = attr.width;
-	area.h = attr.height;
-
-	// Return screen area
-	return area;
+	return window;
 }
 
 void
-screenshot (gint     area_index,
+screenshot (gint     area,
             gboolean include_cursor,
             gboolean include_decorations)
 {
-	// Variables
-	int x, y;
-	char hex[7];
-	unsigned long nwands;
-	struct area area;
+	GdkWindow *window;
 
-	// X11
-	Display *display;
-	Window window;
-	XWindowAttributes attr;
-	XImage *image;
+	window = find_current_window ();
 
-	// MagickWand
-	MagickWand *wand;
-	PixelWand *pwand;
-	PixelIterator *pitr;
-	PixelWand **wand_pixels;
+	GdkRectangle test1, test2;
+	get_window_coordinates (window, include_decorations, &test1, &test2);
 
-	// Select area and get its geometry
-	switch (area_index)
-	{
-		case 0:
-			area = screen_select();
-			break;
-		case 1:
-			area = active_window_select();
-			break;
-		case 2:
-			area = region_select();
-			break;
-	}
-
-	// Get X11 window attributes
-	display = XOpenDisplay(NULL);
-	window = DefaultRootWindow(display);
-	XGetWindowAttributes (display, window, &attr);
-
-	// Set-up Wand
-	MagickWandGenesis ();
-	pwand = NewPixelWand ();
-	PixelSetColor (pwand, "white");
-	wand = NewMagickWand ();
-	MagickNewImage (wand, area.w, area.h, pwand);
-	pitr = NewPixelIterator(wand);
-
-	// Get image from display server
-	image = XGetImage (display, window,
-	                   0, 0,
-	                   attr.width, attr.height,
-	                   AllPlanes, ZPixmap);
-
-	// Transfer image to the wand
-	for (y = area.y; y < area.y + area.h; y++)
-	{
-		wand_pixels = PixelGetNextIteratorRow(pitr, &nwands);
-
-		for (x = area.x; x < area.x + area.w; x++)
-		{
-			sprintf (hex, "#%06x", XGetPixel (image, x, y));
-			PixelSetColor (wand_pixels[x - (int) area.x], hex);
-		}
-
-		(void) PixelSyncIterator (pitr);
-	}
-
-	// Write to disk
-	MagickWriteImage (wand, "screen_test.png");
-
-	// Cleanup
-	XDestroyImage (image);
-	DestroyPixelIterator (pitr);
-	DestroyMagickWand (wand);
-	MagickWandTerminus ();
-	XCloseDisplay (display);
+	printf("Printing window coordinates...\n");
+	printf("Real:    x: %d y: %d w: %d h: %d\n", test1.x, test1.y, test1.width, test1.height);
+	printf("Visible: x: %d y: %d w: %d h: %d\n", test2.x, test2.y, test2.width, test2.height);
 }
