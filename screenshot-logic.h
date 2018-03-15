@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 
 #define SCREEN_AREA 0
-#define WNDOW_AREA  1
+#define WINDOW_AREA 1
 #define REGION_AREA 2
 
 void
