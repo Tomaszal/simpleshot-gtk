@@ -2,6 +2,7 @@
 <gresources>
 	<gresource prefix="/com/tomaszal/simpleshot">
 		<file preprocess="xml-stripblanks">screenshot-menu.ui</file>
+		<file preprocess="xml-stripblanks">actions-menu.ui</file>
 		<file preprocess="xml-stripblanks">app-menu.ui</file>
 	</gresource>
 </gresources>

@@ -3,6 +3,7 @@
 #include "screenshot-app.h"
 #include "screenshot-menu.h"
 #include "screenshot-logic.h"
+#include "actions-menu.h"
 
 struct _ScreenshotMenuPrivate
 {
@@ -38,14 +39,25 @@ G_DEFINE_TYPE_WITH_PRIVATE (ScreenshotMenu,
 static gboolean
 start_screenshot (gpointer data)
 {
+	ActionsMenu *win;
+	GtkApplication *app;
+
 	// Make a screenshot
 	screenshot (gtk_combo_box_get_active (GTK_COMBO_BOX (SCREENSHOT_MENU (data)->priv->area_list)),
 	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_cursor)),
 	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_decorations)));
 
 	// Show screenshot menu window
-	gtk_widget_show (GTK_WIDGET (data));
+	// gtk_widget_show (GTK_WIDGET (data));
 
+	app = gtk_window_get_application (GTK_WINDOW (data));
+
+	// ScreenshotApp *app = SCREENSHOT_MENU (data)->app;
+	win = actions_menu_new (SCREENSHOT_APP (app));
+	gtk_application_add_window (app, GTK_WINDOW (win));
+
+	gtk_window_present (GTK_WINDOW (win));
+	gtk_window_close (GTK_WINDOW (data));
 	// Remove GSource from the main loop
 	return G_SOURCE_REMOVE;
 }
@@ -54,25 +66,27 @@ static void
 screenshot_button_clicked (GtkWidget      *button,
                            ScreenshotMenu *win)
 {
-	// Variables
-	guint delay = 0;
+	// Add slight delay to wait for the window to disappear (haven't found a better soltuion)
+	guint delay = 200;
 
 	// Get the screenshot delay
 	if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->delay_disable)) && gtk_widget_get_sensitive (GTK_WIDGET (win->priv->delay_disable)))
+	{
 		delay = gtk_adjustment_get_value (gtk_spin_button_get_adjustment (GTK_SPIN_BUTTON (win->priv->delay_value)));
+	}
 
 	// Hide screenshot menu window
 	gtk_widget_hide (GTK_WIDGET (win));
+	// gtk_window_close (GTK_WINDOW (win));
 
 	// Start async screenshot function
-	g_timeout_add_seconds (delay, start_screenshot, win);
+	g_timeout_add (delay, start_screenshot, win);
 }
 
 static void
 delay_disable_toggled (GtkWidget      *toggle_button,
                        ScreenshotMenu *win)
 {
-	// Variables
 	gboolean show_delay;
 
 	// Set delay_value sensitivity
@@ -84,7 +98,6 @@ static void
 area_list_changed (GtkWidget      *area_list,
                    ScreenshotMenu *win)
 {
-	// Variables
 	gint     index;
 	gboolean options[3][3] = {
 		{ TRUE,  TRUE,  FALSE },

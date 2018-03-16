@@ -155,5 +155,5 @@ screenshot (gint     area_index,
 		// Draw cursor on pixbuf
 	}
 
-	// gdk_pixbuf_save(screenshot, "scrot.png", "png", NULL, NULL);
+	gdk_pixbuf_save(screenshot, "scrot.png", "png", NULL, NULL);
 }

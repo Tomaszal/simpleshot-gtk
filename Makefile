@@ -6,7 +6,7 @@ GLIB_COMPILE_RESOURCES = $(shell $(PKGCONFIG) --variable=glib_compile_resources 
 GLIB_COMPILE_SCHEMAS = $(shell $(PKGCONFIG) --variable=glib_compile_schemas gio-2.0)
 
 TARGET = simpleshot
-SRC = simpleshot.c screenshot-app.c screenshot-menu.c screenshot-logic.c
+SRC = simpleshot.c screenshot-app.c screenshot-menu.c screenshot-logic.c actions-menu.c
 G_RESOURCE = simpleshot.gresource.xml
 G_SCHEMA = com.tomaszal.simpleshot.gschema.valid
 
