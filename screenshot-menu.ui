@@ -1,10 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.3 -->
 <interface>
 	<requires lib="gtk+" version="3.20"/>
+	<template class="ScreenshotMenu" parent="GtkApplicationWindow">
+		<property name="border_width">5</property>
+		<property name="resizable">False</property>
+		<property name="window_position">center</property>
+		<property name="icon_name">applets-screenshooter</property>
+		<child>
+			<object class="GtkGrid">
+				<property name="visible">True</property>
+				<property name="border_width">10</property>
+				<property name="column_spacing">20</property>
+				<property name="row_spacing">10</property>
+				<child>
+					<object class="GtkLabel">
+						<property name="visible">True</property>
+						<property name="halign">start</property>
+						<property name="label" translatable="yes">Capture mode</property>
+						<attributes>
+							<attribute name="weight" value="ultrabold"/>
+						</attributes>
+					</object>
+					<packing>
+						<property name="top_attach">0</property>
+						<property name="left_attach">0</property>
+					</packing>
+				</child>
+				<child>
+					<object class="GtkGrid">
+						<property name="visible">True</property>
+						<property name="column_spacing">10</property>
+						<property name="row_spacing">10</property>
+						<property name="vexpand">True</property>
+						<property name="valign">center</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label" translatable="yes">Area:</property>
+							</object>
+							<packing>
+								<property name="top_attach">0</property>
+								<property name="left_attach">0</property>
+							</packing>
+						</child>
+						<child>
+							<object class="GtkComboBox" id="area_list">
+								<property name="visible">True</property>
+								<property name="hexpand">True</property>
+								<property name="model">area</property>
+								<property name="tooltip_text" translatable="yes">Choose what area of the screen will be captured.</property>
+								<signal name="changed" handler="area_list_changed"/>
+								<child>
+									<object class="GtkCellRendererText"/>
+									<attributes>
+										<attribute name="text">0</attribute>
+									</attributes>
+								</child>
+							</object>
+							<packing>
+								<property name="top_attach">0</property>
+								<property name="left_attach">1</property>
+							</packing>
+						</child>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label" translatable="yes">Delay:</property>
+							</object>
+							<packing>
+								<property name="top_attach">1</property>
+								<property name="left_attach">0</property>
+							</packing>
+						</child>
+						<child>
+							<object class="GtkBox">
+								<property name="visible">True</property>
+								<property name="spacing">10</property>
+								<child>
+									<object class="GtkSpinButton" id="delay_value">
+										<property name="visible">True</property>
+										<property name="numeric">True</property>
+										<property name="adjustment">delay</property>
+										<property name="tooltip_text" translatable="yes">Delay before the screenshot will be captured (in seconds).</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkCheckButton" id="delay_disable">
+										<property name="visible">True</property>
+										<property name="tooltip_text" translatable="yes">Disable the delay (effectively sets it to 0).</property>
+										<property name="label" translatable="yes">No delay</property>
+										<signal name="toggled" handler="delay_disable_toggled"/>
+									</object>
+								</child>
+							</object>
+							<packing>
+								<property name="top_attach">1</property>
+								<property name="left_attach">1</property>
+							</packing>
+						</child>
+					</object>
+					<packing>
+						<property name="top_attach">1</property>
+						<property name="left_attach">0</property>
+					</packing>
+				</child>
+				<child>
+					<object class="GtkLabel">
+						<property name="visible">True</property>
+						<property name="halign">start</property>
+						<property name="label" translatable="yes">Capture options</property>
+						<attributes>
+							<attribute name="weight" value="ultrabold"/>
+						</attributes>
+					</object>
+					<packing>
+						<property name="top_attach">0</property>
+						<property name="left_attach">1</property>
+					</packing>
+				</child>
+				<child>
+					<object class="GtkBox">
+						<property name="visible">True</property>
+						<property name="spacing">10</property>
+						<property name="orientation">vertical</property>
+						<property name="vexpand">True</property>
+						<property name="valign">center</property>
+						<child>
+							<object class="GtkCheckButton" id="include_cursor">
+								<property name="visible">True</property>
+								<property name="tooltip_text" translatable="yes">Display the mouse pointer on the screenshot.</property>
+								<property name="label" translatable="yes">Include mouse pointer</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkCheckButton" id="include_decorations">
+								<property name="visible">True</property>
+								<property name="tooltip_text" translatable="yes">Display window decorations (titlebar, borders, etc.) on the screenshot.</property>
+								<property name="label" translatable="yes">Include windows decorations</property>
+							</object>
+						</child>
+					</object>
+					<packing>
+						<property name="top_attach">1</property>
+						<property name="left_attach">1</property>
+					</packing>
+				</child>
+			</object>
+		</child>
+		<child type="titlebar">
+			<object class="GtkHeaderBar" id="headerbar">
+				<property name="visible">True</property>
+				<property name="spacing">10</property>
+				<property name="show_close_button">True</property>
+				<property name="decoration_layout">menu:close</property>
+				<property name="title">Simpleshot</property>
+				<property name="subtitle" translatable="yes">Take a screenshot</property>
+				<child>
+					<object class="GtkButton">
+						<property name="visible">True</property>
+						<property name="has_focus">True</property>
+						<property name="label" translatable="yes">OK</property>
+						<signal name="clicked" handler="screenshot_button_clicked"/>
+						<style>
+							<class name="suggested-action"/>
+						</style>
+					</object>
+					<packing>
+						<property name="pack_type">end</property>
+					</packing>
+				</child>
+			</object>
+		</child>
+	</template>
 	<object class="GtkListStore" id="area">
 		<columns>
-			<!-- column-name Text -->
 			<column type="gchararray"/>
 		</columns>
 		<data>
@@ -25,217 +194,4 @@
 		<property name="step_increment">1</property>
 		<property name="page_increment">5</property>
 	</object>
-	<template class="ScreenshotMenu" parent="GtkApplicationWindow">
-		<property name="can_focus">False</property>
-		<property name="border_width">5</property>
-		<property name="resizable">False</property>
-		<property name="window_position">center</property>
-		<property name="icon_name">applets-screenshooter</property>
-		<child>
-			<object class="GtkBox">
-				<property name="visible">True</property>
-				<property name="can_focus">False</property>
-				<!-- <property name="halign">center</property> -->
-				<!-- <property name="valign">center</property> -->
-				<property name="border_width">8</property>
-				<property name="orientation">vertical</property>
-				<property name="spacing">8</property>
-				<child>
-					<object class="GtkLabel">
-						<property name="visible">True</property>
-						<property name="can_focus">False</property>
-						<property name="label" translatable="yes">Capture mode</property>
-						<property name="halign">start</property>
-						<attributes>
-							<attribute name="weight" value="ultrabold"/>
-						</attributes>
-					</object>
-					<packing>
-						<property name="expand">False</property>
-						<property name="fill">True</property>
-						<property name="position">0</property>
-					</packing>
-				</child>
-				<child>
-					<object class="GtkGrid">
-						<property name="visible">True</property>
-						<property name="can_focus">False</property>
-						<property name="margin_left">16</property>
-						<property name="row_spacing">8</property>
-						<property name="column_spacing">8</property>
-						<child>
-							<object class="GtkLabel">
-								<property name="visible">True</property>
-								<property name="can_focus">False</property>
-								<property name="label" translatable="yes">Area:</property>
-								<property name="halign">start</property>
-							</object>
-							<packing>
-								<property name="left_attach">0</property>
-								<property name="top_attach">0</property>
-							</packing>
-						</child>
-						<child>
-							<object class="GtkLabel">
-								<property name="visible">True</property>
-								<property name="can_focus">False</property>
-								<property name="label" translatable="yes">Delay:</property>
-								<property name="halign">start</property>
-							</object>
-							<packing>
-								<property name="left_attach">0</property>
-								<property name="top_attach">1</property>
-							</packing>
-						</child>
-						<child>
-							<object class="GtkComboBox" id="area_list">
-								<property name="visible">True</property>
-								<property name="can_focus">False</property>
-								<property name="model">area</property>
-								<signal name="changed" handler="area_list_changed"/>
-								<child>
-									<object class="GtkCellRendererText"/>
-									<attributes>
-										<attribute name="text">0</attribute>
-									</attributes>
-								</child>
-							</object>
-							<packing>
-								<property name="left_attach">1</property>
-								<property name="top_attach">0</property>
-							</packing>
-						</child>
-						<child>
-							<object class="GtkBox">
-								<property name="visible">True</property>
-								<property name="can_focus">False</property>
-								<property name="spacing">8</property>
-								<child>
-									<object class="GtkSpinButton" id="delay_value">
-										<property name="visible">True</property>
-										<property name="can_focus">True</property>
-										<property name="max_width_chars">3</property>
-										<property name="adjustment">delay</property>
-										<property name="numeric">True</property>
-									</object>
-									<packing>
-										<property name="expand">False</property>
-										<property name="fill">True</property>
-										<property name="position">0</property>
-									</packing>
-								</child>
-								<child>
-									<object class="GtkCheckButton" id="delay_disable">
-										<property name="label" translatable="yes">No delay</property>
-										<property name="visible">True</property>
-										<property name="can_focus">True</property>
-										<property name="receives_default">False</property>
-										<property name="draw_indicator">True</property>
-										<signal name="toggled" handler="delay_disable_toggled"/>
-									</object>
-									<packing>
-										<property name="expand">False</property>
-										<property name="fill">True</property>
-										<property name="position">1</property>
-									</packing>
-								</child>
-							</object>
-							<packing>
-								<property name="left_attach">1</property>
-								<property name="top_attach">1</property>
-							</packing>
-						</child>
-					</object>
-					<packing>
-						<property name="expand">False</property>
-						<property name="fill">True</property>
-						<property name="position">1</property>
-					</packing>
-				</child>
-				<child>
-					<object class="GtkLabel">
-						<property name="visible">True</property>
-						<property name="can_focus">False</property>
-						<property name="label" translatable="yes">Capture options</property>
-						<property name="halign">start</property>
-						<attributes>
-							<attribute name="weight" value="ultrabold"/>
-						</attributes>
-					</object>
-					<packing>
-						<property name="expand">False</property>
-						<property name="fill">True</property>
-						<property name="position">2</property>
-					</packing>
-				</child>
-				<child>
-					<object class="GtkBox">
-						<property name="visible">True</property>
-						<property name="can_focus">False</property>
-						<property name="margin_left">16</property>
-						<property name="orientation">vertical</property>
-						<property name="spacing">8</property>
-						<child>
-							<object class="GtkCheckButton" id="include_cursor">
-								<property name="label" translatable="yes">Include mouse pointer</property>
-								<property name="visible">True</property>
-								<property name="can_focus">True</property>
-								<property name="receives_default">False</property>
-								<property name="draw_indicator">True</property>
-							</object>
-							<packing>
-								<property name="expand">False</property>
-								<property name="fill">True</property>
-								<property name="position">0</property>
-							</packing>
-						</child>
-						<child>
-							<object class="GtkCheckButton" id="include_decorations">
-								<property name="label" translatable="yes">Include windows decorations</property>
-								<property name="visible">True</property>
-								<property name="can_focus">True</property>
-								<property name="receives_default">False</property>
-								<property name="draw_indicator">True</property>
-							</object>
-							<packing>
-								<property name="expand">False</property>
-								<property name="fill">True</property>
-								<property name="position">1</property>
-							</packing>
-						</child>
-					</object>
-					<packing>
-						<property name="expand">False</property>
-						<property name="fill">True</property>
-						<property name="position">3</property>
-					</packing>
-				</child>
-			</object>
-		</child>
-		<child type="titlebar">
-			<object class="GtkHeaderBar" id="headerbar">
-				<property name="visible">True</property>
-				<property name="can_focus">False</property>
-				<property name="spacing">8</property>
-				<property name="show_close_button">True</property>
-				<property name="decoration_layout">menu:close</property>
-				<child>
-					<object class="GtkButton">
-						<property name="label" translatable="yes">Take a screenshot</property>
-						<property name="visible">True</property>
-						<property name="can_focus">True</property>
-						<property name="has_focus">True</property>
-						<property name="receives_default">True</property>
-						<signal name="clicked" handler="screenshot_button_clicked"/>
-						<style>
-							<class name="suggested-action"/>
-						</style>
-					</object>
-					<packing>
-						<property name="pack_type">end</property>
-					</packing>
-				</child>
-			</object>
-		</child>
-	</template>
 </interface>
