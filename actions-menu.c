@@ -1,12 +1,13 @@
 #include <gtk/gtk.h>
 
 #include "screenshot-app.h"
+#include "screenshot-menu.h"
 #include "actions-menu.h"
 
 struct _ActionsMenuPrivate
 {
 	GtkWidget *preview_drawing_area;
-	// GtkWidget *preview_aspect_frame;
+	GtkWidget *preview_aspect_frame;
 };
 
 typedef struct _ActionsMenuPrivate ActionsMenuPrivate;
@@ -48,6 +49,25 @@ on_preview_draw (GtkWidget *widget,
 }
 
 static void
+back_button_clicked (GtkWidget   *button,
+                     ActionsMenu *win)
+{
+	GtkApplication *app;
+	ScreenshotMenu *new_win;
+
+	// Create a new screenshot menu window and add it to the application
+	app = gtk_window_get_application (GTK_WINDOW (win));
+	new_win = screenshot_menu_new (SCREENSHOT_APP (app));
+	gtk_application_add_window (app, GTK_WINDOW (new_win));
+
+	// Close the actions menu window (which removes it from the application)
+	gtk_window_close (GTK_WINDOW (win));
+
+	// Show the screenshot menu window
+	gtk_window_present (GTK_WINDOW (new_win));
+}
+
+static void
 actions_menu_startup (ActionsMenu *win)
 {
 	printf("test\n");
@@ -70,8 +90,10 @@ actions_menu_class_init (ActionsMenuClass *class)
 	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (class), "/com/tomaszal/simpleshot/actions-menu.ui");
 
 	// Bind widgets from the template
+	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), back_button_clicked);
+
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, preview_drawing_area);
-	// gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, preview_aspect_frame);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, preview_aspect_frame);
 
 	// Bind signals from the template
 	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), on_preview_draw);
@@ -100,6 +122,12 @@ actions_menu_new (GdkPixbuf *screenshot,
 	// Set drawing preview area dimensions
 	gtk_widget_set_size_request (GTK_WIDGET (win->priv->preview_drawing_area),
 	                             width, height);
+
+	// Set preview aspect frame ratio
+	gtk_aspect_frame_set (GTK_ASPECT_FRAME (win->priv->preview_aspect_frame), 0.5, 0.5,
+	                      (gfloat) width / (gfloat) height,
+	                      FALSE);
+
 
 	return win;
 }
