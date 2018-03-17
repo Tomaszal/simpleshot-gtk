@@ -7,7 +7,7 @@
 #define WINDOW_AREA 1
 #define REGION_AREA 2
 
-void
+GdkPixbuf *
 screenshot (gint     area,
             gboolean include_cursor,
             gboolean include_decorations);

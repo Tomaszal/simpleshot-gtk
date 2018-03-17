@@ -10,6 +10,7 @@ G_DECLARE_FINAL_TYPE (ActionsMenu,
                       MENU,
                       GtkApplicationWindow)
 
-ActionsMenu *actions_menu_new (ScreenshotApp *app);
+ActionsMenu *actions_menu_new (GdkPixbuf *screenshot,
+                               ScreenshotApp *app);
 
 #endif // ACTIONS_MENU_H

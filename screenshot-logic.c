@@ -113,7 +113,7 @@ get_window_area (GdkWindow *window,
 	return area;
 }
 
-void
+GdkPixbuf *
 screenshot (gint     area_index,
             gboolean include_cursor,
             gboolean include_decorations)
@@ -155,5 +155,7 @@ screenshot (gint     area_index,
 		// Draw cursor on pixbuf
 	}
 
-	gdk_pixbuf_save(screenshot, "scrot.png", "png", NULL, NULL);
+	return screenshot;
+
+	// gdk_pixbuf_save(screenshot, "scrot.png", "png", NULL, NULL);
 }

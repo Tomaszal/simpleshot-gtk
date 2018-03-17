@@ -12,6 +12,7 @@
 			<object class="GtkGrid">
 				<property name="visible">True</property>
 				<property name="can_focus">False</property>
+				<property name="border_width">8</property>
 				<property name="row_spacing">8</property>
 				<property name="column_spacing">8</property>
 				<child>
@@ -48,7 +49,10 @@
 					<object class="GtkBox">
 						<property name="visible">True</property>
 						<property name="can_focus">False</property>
+						<property name="spacing">8</property>
 						<property name="orientation">vertical</property>
+						<property name="vexpand">True</property>
+						<property name="valign">GTK_ALIGN_CENTER</property>
 						<child>
 							<object class="GtkRadioButton" id="action">
 								<property name="label" translatable="yes">Save</property>
@@ -84,6 +88,7 @@
 							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="can_focus">False</property>
+								<property name="spacing">8</property>
 								<child>
 									<object class="GtkRadioButton">
 										<property name="label" translatable="yes">Open with</property>
@@ -145,17 +150,13 @@
 					<object class="GtkAlignment">
 						<property name="visible">True</property>
 						<property name="can_focus">False</property>
+						<property name="vexpand">True</property>
+						<property name="valign">GTK_ALIGN_CENTER</property>
 						<child>
-							<object class="GtkAspectFrame">
+							<object class="GtkDrawingArea" id="preview_drawing_area">
 								<property name="visible">True</property>
 								<property name="can_focus">False</property>
-								<property name="shadow_type">none</property>
-								<child>
-									<object class="GtkDrawingArea">
-										<property name="visible">True</property>
-										<property name="can_focus">False</property>
-									</object>
-								</child>
+								<signal name="draw" handler="on_preview_draw"/>
 							</object>
 						</child>
 					</object>
@@ -178,7 +179,6 @@
 						<property name="visible">True</property>
 						<property name="can_focus">True</property>
 						<property name="receives_default">True</property>
-						<property name="action_name">app.quit</property>
 						<child>
 							<object class="GtkImage">
 								<property name="visible">True</property>
@@ -199,6 +199,7 @@
 						<property name="visible">True</property>
 						<property name="can_focus">True</property>
 						<property name="receives_default">True</property>
+						<property name="action_name">app.quit</property>
 						<child>
 							<object class="GtkImage">
 								<property name="visible">True</property>

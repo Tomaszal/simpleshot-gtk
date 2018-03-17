@@ -39,25 +39,26 @@ G_DEFINE_TYPE_WITH_PRIVATE (ScreenshotMenu,
 static gboolean
 start_screenshot (gpointer data)
 {
-	ActionsMenu *win;
 	GtkApplication *app;
+	ActionsMenu *win;
+	GdkPixbuf *screenshot_pixbuf;
 
 	// Make a screenshot
-	screenshot (gtk_combo_box_get_active (GTK_COMBO_BOX (SCREENSHOT_MENU (data)->priv->area_list)),
-	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_cursor)),
-	            gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_decorations)));
+	screenshot_pixbuf = screenshot (gtk_combo_box_get_active (GTK_COMBO_BOX (SCREENSHOT_MENU (data)->priv->area_list)),
+	                                gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_cursor)),
+	                                gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (SCREENSHOT_MENU (data)->priv->include_decorations)));
 
-	// Show screenshot menu window
-	// gtk_widget_show (GTK_WIDGET (data));
-
+	// Create a new actions menu window and add it to the application
 	app = gtk_window_get_application (GTK_WINDOW (data));
-
-	// ScreenshotApp *app = SCREENSHOT_MENU (data)->app;
-	win = actions_menu_new (SCREENSHOT_APP (app));
+	win = actions_menu_new (screenshot_pixbuf, SCREENSHOT_APP (app));
 	gtk_application_add_window (app, GTK_WINDOW (win));
 
-	gtk_window_present (GTK_WINDOW (win));
+	// Close the screenshot menu window (which removes it from the application)
 	gtk_window_close (GTK_WINDOW (data));
+
+	// Show the actions menu window
+	gtk_window_present (GTK_WINDOW (win));
+
 	// Remove GSource from the main loop
 	return G_SOURCE_REMOVE;
 }
@@ -67,7 +68,7 @@ screenshot_button_clicked (GtkWidget      *button,
                            ScreenshotMenu *win)
 {
 	// Add slight delay to wait for the window to disappear (haven't found a better soltuion)
-	guint delay = 200;
+	guint delay = 400;
 
 	// Get the screenshot delay
 	if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->delay_disable)) && gtk_widget_get_sensitive (GTK_WIDGET (win->priv->delay_disable)))
@@ -77,7 +78,6 @@ screenshot_button_clicked (GtkWidget      *button,
 
 	// Hide screenshot menu window
 	gtk_widget_hide (GTK_WIDGET (win));
-	// gtk_window_close (GTK_WINDOW (win));
 
 	// Start async screenshot function
 	g_timeout_add (delay, start_screenshot, win);
