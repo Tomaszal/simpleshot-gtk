@@ -73,7 +73,8 @@ screenshot_button_clicked (GtkWidget      *button,
 	// Get the screenshot delay
 	if (! gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->delay_disable)) && gtk_widget_get_sensitive (GTK_WIDGET (win->priv->delay_disable)))
 	{
-		delay = gtk_adjustment_get_value (gtk_spin_button_get_adjustment (GTK_SPIN_BUTTON (win->priv->delay_value)));
+		// Convert delay to seconds
+		delay = 1000 * gtk_adjustment_get_value (gtk_spin_button_get_adjustment (GTK_SPIN_BUTTON (win->priv->delay_value)));
 	}
 
 	// Hide screenshot menu window

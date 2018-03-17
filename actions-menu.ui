@@ -34,56 +34,67 @@
 						<property name="vexpand">True</property>
 						<property name="valign">center</property>
 						<child>
-							<object class="GtkRadioButton" id="action">
+							<object class="GtkRadioButton" id="action_save">
 								<property name="visible">True</property>
 								<property name="tooltip_text" translatable="yes">Save the screenshot to a PNG file.</property>
 								<property name="label" translatable="yes">Save</property>
 							</object>
 						</child>
 						<child>
-							<object class="GtkRadioButton">
+							<object class="GtkRadioButton" id="action_copy">
 								<property name="visible">True</property>
-								<property name="group">action</property>
+								<property name="group">action_save</property>
 								<property name="tooltip_text" translatable="yes">Copy the screenshot to the clipboard to paste it elsewhere later.</property>
 								<property name="label" translatable="yes">Copy to clipboard</property>
 							</object>
 						</child>
 						<child>
-							<object class="GtkBox">
+							<object class="GtkGrid">
 								<property name="visible">True</property>
-								<property name="spacing">10</property>
+								<property name="column_spacing">10</property>
+								<property name="row_spacing">10</property>
 								<child>
-									<object class="GtkRadioButton">
+									<object class="GtkRadioButton" id="action_open">
 										<property name="visible">True</property>
-										<property name="group">action</property>
+										<property name="group">action_save</property>
 										<property name="tooltip_text" translatable="yes">Open the screenshot with the chosen application.</property>
 										<property name="label" translatable="yes">Open with:</property>
+										<signal name="toggled" handler="action_open_toggled"/>
 									</object>
+									<packing>
+										<property name="top_attach">0</property>
+										<property name="left_attach">0</property>
+									</packing>
 								</child>
 								<child>
-									<object class="GtkAppChooserButton">
+									<object class="GtkAppChooserButton" id="png_application">
 										<property name="visible">True</property>
 										<property name="content_type">image/png</property>
 										<property name="tooltip_text" translatable="yes">Choose the desired application.</property>
 									</object>
+									<packing>
+										<property name="top_attach">0</property>
+										<property name="left_attach">1</property>
+									</packing>
 								</child>
-							</object>
-						</child>
-						<child>
-							<object class="GtkBox">
-								<property name="visible">True</property>
-								<property name="spacing">10</property>
 								<child>
-									<object class="GtkRadioButton">
+									<object class="GtkRadioButton" id="action_host">
 										<property name="visible">True</property>
-										<property name="group">action</property>
+										<property name="hexpand">True</property>
+										<property name="group">action_save</property>
 										<property name="tooltip_text" translatable="yes">Host the screenshot on the chosen online image hosting service.</property>
 										<property name="label" translatable="yes">Host on:</property>
+										<signal name="toggled" handler="action_host_toggled"/>
 									</object>
+									<packing>
+										<property name="top_attach">1</property>
+										<property name="left_attach">0</property>
+									</packing>
 								</child>
 								<child>
-									<object class="GtkComboBox">
+									<object class="GtkComboBox" id="hosting_service">
 										<property name="visible">True</property>
+										<property name="hexpand">True</property>
 										<property name="model">hosting_services</property>
 										<property name="tooltip_text" translatable="yes">Choose the desired online image hosting service.</property>
 										<child>
@@ -93,6 +104,10 @@
 											</attributes>
 										</child>
 									</object>
+									<packing>
+										<property name="top_attach">1</property>
+										<property name="left_attach">1</property>
+									</packing>
 								</child>
 							</object>
 						</child>
@@ -161,6 +176,7 @@
 						<property name="visible">True</property>
 						<property name="has_focus">True</property>
 						<property name="label" translatable="yes">OK</property>
+						<signal name="clicked" handler="ok_button_clicked"/>
 						<style>
 							<class name="suggested-action"/>
 						</style>

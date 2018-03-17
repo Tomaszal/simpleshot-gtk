@@ -6,6 +6,16 @@
 
 struct _ActionsMenuPrivate
 {
+	GSettings *settings;
+
+	GtkWidget *action_save;
+	GtkWidget *action_copy;
+	GtkWidget *action_open;
+	GtkWidget *action_host;
+
+	GtkWidget *png_application;
+	GtkWidget *hosting_service;
+
 	GtkWidget *preview_drawing_area;
 	GtkWidget *preview_aspect_frame;
 };
@@ -49,7 +59,23 @@ on_preview_draw (GtkWidget *widget,
 }
 
 static void
-back_button_clicked (GtkWidget   *button,
+action_open_toggled (GtkWidget   *widget,
+                     ActionsMenu *win)
+{
+	gtk_widget_set_sensitive (GTK_WIDGET (win->priv->png_application),
+	                          gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)));
+}
+
+static void
+action_host_toggled (GtkWidget   *widget,
+                     ActionsMenu *win)
+{
+	gtk_widget_set_sensitive (GTK_WIDGET (win->priv->hosting_service),
+	                          gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)));
+}
+
+static void
+back_button_clicked (GtkWidget   *widget,
                      ActionsMenu *win)
 {
 	GtkApplication *app;
@@ -68,9 +94,20 @@ back_button_clicked (GtkWidget   *button,
 }
 
 static void
-actions_menu_startup (ActionsMenu *win)
+ok_button_clicked (GtkWidget   *widget,
+                   ActionsMenu *win)
 {
-	printf("test\n");
+	// Do stuff
+}
+
+static void
+actions_menu_dispose (GObject *object)
+{
+	// Dispose of settings object
+	g_clear_object (&ACTIONS_MENU (object)->priv->settings);
+
+	// Dispose of parent class
+	G_OBJECT_CLASS (actions_menu_parent_class)->dispose (object);
 }
 
 static void
@@ -81,21 +118,64 @@ actions_menu_init (ActionsMenu *win)
 
 	// Initialize window from the template
 	gtk_widget_init_template (GTK_WIDGET (win));
+
+	// Initialize GSettings
+	win->priv->settings = g_settings_new ("com.tomaszal.simpleshot");
+
+	// Bind settings
+	g_settings_bind (win->priv->settings, "action-save",
+	                 win->priv->action_save, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (win->priv->settings, "action-copy",
+	                 win->priv->action_copy, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (win->priv->settings, "action-open",
+	                 win->priv->action_open, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (win->priv->settings, "action-host",
+	                 win->priv->action_host, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+
+	g_settings_bind (win->priv->settings, "png-application",
+	                 win->priv->png_application, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind (win->priv->settings, "hosting-service",
+	                 win->priv->hosting_service, "active",
+	                 G_SETTINGS_BIND_DEFAULT);
+
+	// Update UI elements
+	action_open_toggled (GTK_WIDGET (win->priv->action_open), win);
+	action_host_toggled (GTK_WIDGET (win->priv->action_host), win);
 }
 
 static void
 actions_menu_class_init (ActionsMenuClass *class)
 {
+	// Assign GApplication entry points
+	G_OBJECT_CLASS (class)->dispose = actions_menu_dispose;
+
 	// Set window template from a resource
 	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (class), "/com/tomaszal/simpleshot/actions-menu.ui");
 
 	// Bind widgets from the template
-	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), back_button_clicked);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, action_save);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, action_copy);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, action_open);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, action_host);
+
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, png_application);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, hosting_service);
 
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, preview_drawing_area);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (class), ActionsMenu, preview_aspect_frame);
 
 	// Bind signals from the template
+	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), back_button_clicked);
+	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), ok_button_clicked);
+
+	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), action_open_toggled);
+	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), action_host_toggled);
+
 	gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (class), on_preview_draw);
 }
 
@@ -127,7 +207,6 @@ actions_menu_new (GdkPixbuf *screenshot,
 	gtk_aspect_frame_set (GTK_ASPECT_FRAME (win->priv->preview_aspect_frame), 0.5, 0.5,
 	                      (gfloat) width / (gfloat) height,
 	                      FALSE);
-
 
 	return win;
 }

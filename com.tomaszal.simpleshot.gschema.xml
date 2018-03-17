@@ -16,5 +16,23 @@
 		<key name="include-decorations" type="b">
 			<default>false</default>
 		</key>
+		<key name="action-save" type="b">
+			<default>true</default>
+		</key>
+		<key name="action-copy" type="b">
+			<default>false</default>
+		</key>
+		<key name="action-open" type="b">
+			<default>false</default>
+		</key>
+		<key name="action-host" type="b">
+			<default>false</default>
+		</key>
+		<key name="png-application" type="i">
+			<default>0</default>
+		</key>
+		<key name="hosting-service" type="i">
+			<default>0</default>
+		</key>
 	</schema>
 </schemalist>
