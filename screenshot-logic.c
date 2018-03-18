@@ -124,21 +124,21 @@ screenshot (gint     area_index,
 
 	root = gdk_get_default_root_window ();
 
-	if (area_index == SCREEN_AREA)
+	if (area_index == AREA_SCREEN)
 	{
 		area = get_window_area (root, FALSE);
 
 		printf("Entire screen:\n");
 	}
 
-	if (area_index == WINDOW_AREA)
+	if (area_index == AREA_WINDOW)
 	{
 		area = get_window_area (find_current_window (), include_decorations);
 
 		printf("Current window:\n");
 	}
 
-	if (area_index == REGION_AREA)
+	if (area_index == AREA_REGION)
 	{
 		area = get_region_area ();
 
@@ -150,12 +150,10 @@ screenshot (gint     area_index,
 	// Create pixbuf from window
 	screenshot = gdk_pixbuf_get_from_window (root, area.x, area.y, area.width, area.height);
 
-	if (include_cursor && area_index != REGION_AREA)
+	if (include_cursor && area_index != AREA_REGION)
 	{
 		// Draw cursor on pixbuf
 	}
 
 	return screenshot;
-
-	// gdk_pixbuf_save(screenshot, "scrot.png", "png", NULL, NULL);
 }

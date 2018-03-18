@@ -2,6 +2,7 @@
 #define SCREENSHOT_MENU_H
 
 #include <gtk/gtk.h>
+
 #include "screenshot-app.h"
 
 G_DECLARE_FINAL_TYPE (ScreenshotMenu,

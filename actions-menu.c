@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include "screenshot-app.h"
 #include "screenshot-menu.h"
@@ -34,6 +35,104 @@ struct _ActionsMenu
 G_DEFINE_TYPE_WITH_PRIVATE (ActionsMenu,
                             actions_menu,
                             GTK_TYPE_APPLICATION_WINDOW);
+
+static gboolean
+action_save (ActionsMenu *win)
+{
+	GtkWidget *dialog;
+	GtkFileChooser *chooser;
+	gchararray filename;
+	gint result;
+
+	// Create a new file chooser dialog
+	dialog = gtk_file_chooser_dialog_new (_("Save Screenshot"),
+	                                      GTK_WINDOW (win),
+	                                      GTK_FILE_CHOOSER_ACTION_SAVE,
+	                                      _("Cancel"),
+	                                      GTK_RESPONSE_CANCEL,
+	                                      _("Save"),
+	                                      GTK_RESPONSE_ACCEPT,
+	                                      NULL);
+
+	chooser = GTK_FILE_CHOOSER (dialog);
+
+	// Forbid saving in system folders and warn about overwriting
+	gtk_file_chooser_set_local_only (chooser, TRUE);
+	gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+
+	// Generate and set the suggested filename
+	filename = g_date_time_format (g_date_time_new_now_local (), "Screenshot_%Y-%m-%d_%H-%M-%S.png");
+	gtk_file_chooser_set_current_name (chooser, filename);
+
+	// Run a dialog box
+	result = gtk_dialog_run (GTK_DIALOG (dialog));
+
+	// Grab the filename and destroy the dialog
+	filename = gtk_file_chooser_get_filename (chooser);
+	gtk_widget_destroy (dialog);
+
+	// Save the screenshot
+	if (result == GTK_RESPONSE_ACCEPT)
+	{
+		gdk_pixbuf_save (win->screenshot, filename, "png", NULL, NULL);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+static gboolean
+action_copy (ActionsMenu *win)
+{
+	GtkClipboard *clipboard;
+
+	// Get the default clipboard object
+	clipboard = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
+
+	// Copy screenshot pixbuf to clipboard
+	gtk_clipboard_set_image (clipboard, win->screenshot);
+
+	return FALSE;
+}
+
+static gboolean
+action_open (ActionsMenu *win)
+{
+	GAppInfo *appinfo;
+	gchararray filename;
+	GList *file = NULL;
+
+	// Get the selected appliaction information
+	appinfo = gtk_app_chooser_get_app_info (GTK_APP_CHOOSER (win->priv->png_application));
+
+	// Generate and set the suggested filename
+	filename = g_date_time_format (g_date_time_new_now_local (), "/tmp/Screenshot_%Y-%m-%d_%H-%M-%S.png");
+
+	// Save screenshot to a temporary file
+	gdk_pixbuf_save (win->screenshot, filename, "png", NULL, NULL);
+
+	// Launch the appliacation with screnshot URI
+	file = g_list_append (file, g_filename_to_uri (filename, NULL, NULL));
+	g_app_info_launch_uris (appinfo, file, NULL, NULL);
+
+	return TRUE;
+}
+
+static void
+action_host (ActionsMenu *win)
+{
+	gchararray hosting_service_name = "NaN";
+	gint hosting_service;
+
+	hosting_service = gtk_combo_box_get_active (GTK_COMBO_BOX (win->priv->hosting_service));
+
+	if (hosting_service == HOST_IMGUR) {
+		hosting_service_name = "Imgur";
+	}
+
+	printf("Hosting screenshot on %s...\n", hosting_service_name);
+}
 
 static void
 on_preview_draw (GtkWidget *widget,
@@ -97,7 +196,32 @@ static void
 ok_button_clicked (GtkWidget   *widget,
                    ActionsMenu *win)
 {
-	// Do stuff
+	gboolean close_application;
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->action_save)))
+	{
+		close_application = action_save (win);
+	}
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->action_copy)))
+	{
+		close_application = action_copy (win);
+	}
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->action_open)))
+	{
+		close_application = action_open (win);
+	}
+
+	if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (win->priv->action_host)))
+	{
+		action_host (win);
+	}
+
+	if (close_application)
+	{
+		g_application_quit (G_APPLICATION (gtk_window_get_application (GTK_WINDOW (win))));
+	}
 }
 
 static void

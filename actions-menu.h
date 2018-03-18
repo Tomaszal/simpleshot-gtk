@@ -2,7 +2,10 @@
 #define ACTIONS_MENU_H
 
 #include <gtk/gtk.h>
+
 #include "screenshot-app.h"
+
+#define HOST_IMGUR 0
 
 G_DECLARE_FINAL_TYPE (ActionsMenu,
                       actions_menu,

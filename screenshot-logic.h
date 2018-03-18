@@ -3,9 +3,9 @@
 
 #include <gtk/gtk.h>
 
-#define SCREEN_AREA 0
-#define WINDOW_AREA 1
-#define REGION_AREA 2
+#define AREA_SCREEN 0
+#define AREA_WINDOW 1
+#define AREA_REGION 2
 
 GdkPixbuf *
 screenshot (gint     area,
