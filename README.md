@@ -4,7 +4,7 @@
 
 This is an easy-to-use and barebones Linux screenshot tool with a GTK interface. I am creating this software because I was unable to find one that satisfied all of my needs while remaining simple and light.
 
-<img src="screenshot-menu.jpg" width=50%/><img src="actions-menu.jpg" width=50%/>
+<img src="screenshot-menu.png" width="45%" />&emsp;<img src="actions-menu.png" width="50%" />
 
 ## Features
 
