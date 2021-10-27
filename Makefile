@@ -9,6 +9,7 @@ TARGET = simpleshot
 SRC = simpleshot.c screenshot-app.c screenshot-menu.c screenshot-logic.c actions-menu.c
 G_RESOURCE = simpleshot.gresource.xml
 G_SCHEMA = com.tomaszal.simpleshot.gschema.valid
+G_SCHEMA_XML = com.tomaszal.simpleshot.gschema.xml
 
 OBJS = resources.o $(SRC:.c=.o)
 
@@ -28,6 +29,11 @@ resources.c: $(G_RESOURCE) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=. --gen
 
 $(TARGET): $(OBJS) gschemas.compiled
 	$(CC) -o $@ $(OBJS) $(LIBS)
+
+install:
+	cp $(TARGET) $(DESTDIR)$(PREFIX)/bin/
+	cp $(G_SCHEMA_XML) $(DESTDIR)$(PREFIX)/share/glib-2.0/schemas/
+	glib-compile-schemas $(DESTDIR)$(PREFIX)/share/glib-2.0/schemas/
 
 clean:
 	rm -f resources.c
